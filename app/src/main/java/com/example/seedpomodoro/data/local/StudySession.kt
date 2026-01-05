@@ -1,11 +1,12 @@
 package com.example.seedpomodoro.data.local
 
-data class StudySession(
-    val sessionId: Int,
-    val startTime: Long,
-    val endTime: Long,
-    val durationMinutes: Int,
-    val isCompleted: Boolean,
-    val date: String
-)
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
+@Entity(tableName = "study_sessions")
+data class StudySession(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val durationMinutes: Int,
+    val timestamp: Long
+)
