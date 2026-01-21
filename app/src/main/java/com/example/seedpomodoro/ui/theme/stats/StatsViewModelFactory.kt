@@ -1,4 +1,4 @@
-package com.example.seedpomodoro.ui.theme.stats
+package com.example.seedpomodoro.domain.stats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +13,6 @@ class StatsViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return StatsViewModel(repository) as T
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+        throw IllegalArgumentException("Unknown ViewModel")
     }
 }

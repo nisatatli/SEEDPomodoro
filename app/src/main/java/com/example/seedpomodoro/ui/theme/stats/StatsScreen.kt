@@ -1,20 +1,26 @@
 package com.example.seedpomodoro.ui.theme.stats
 
+
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.seedpomodoro.SeedApplication
-import com.example.seedpomodoro.ui.theme.stats.StatsViewModel
-import com.example.seedpomodoro.ui.theme.stats.StatsViewModelFactory
+import com.example.seedpomodoro.domain.stats.DailyStat
+import com.example.seedpomodoro.domain.stats.StatsViewModel
+import com.example.seedpomodoro.domain.stats.StatsViewModelFactory
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
 
-import java.text.SimpleDateFormat
-import java.util.*
+
+enum class StatsTab {
+    DAILY, WEEKLY, YEARLY
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,9 +33,11 @@ fun StatsScreen() {
         factory = StatsViewModelFactory(app.repository)
     )
 
-    val totalSessions by viewModel.totalSessions.collectAsState()
-    val totalMinutes by viewModel.totalMinutes.collectAsState()
-    val sessions by viewModel.sessions.collectAsState()
+    val dailyStats by viewModel.dailyStats.collectAsState()
+    val weeklyAverage by viewModel.weeklyAverage.collectAsState()
+    val yearlyAverage by viewModel.yearlyAverage.collectAsState()
+
+    var selectedTab by remember { mutableStateOf(StatsTab.DAILY) }
 
     Scaffold(
         topBar = {
@@ -37,47 +45,118 @@ fun StatsScreen() {
         }
     ) { padding ->
 
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(16.dp)
         ) {
 
-            item {
-                Card {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Total Session", style = MaterialTheme.typography.labelLarge)
-                        Text("$totalSessions", style = MaterialTheme.typography.headlineMedium)
-                    }
+            TabRow(selectedTabIndex = selectedTab.ordinal) {
+                StatsTab.values().forEach { tab ->
+                    Tab(
+                        selected = selectedTab == tab,
+                        onClick = { selectedTab = tab },
+                        text = { Text(tab.name.lowercase().replaceFirstChar { it.uppercase() }) }
+                    )
                 }
             }
 
-            item {
-                Card {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Total Minutes (m)", style = MaterialTheme.typography.labelLarge)
-                        Text("$totalMinutes", style = MaterialTheme.typography.headlineMedium)
-                    }
-                }
-            }
+            Spacer(modifier = Modifier.height(24.dp))
 
-            items(sessions) { session ->
+            when (selectedTab) {
+
+                StatsTab.DAILY -> DailyStatsView(dailyStats)
+
+                StatsTab.WEEKLY -> AverageCard(
+                    title = "Weekly Average",
+                    value = weeklyAverage
+                )
+
+                StatsTab.YEARLY -> AverageCard(
+                    title = "Yearly Average",
+                    value = yearlyAverage
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DailyStatsView(stats: List<DailyStat>) {
+
+    if (stats.isEmpty()) {
+        Text("No data yet")
+        return
+    }
+
+    val max = stats.maxOf { it.minutes }.coerceAtLeast(1)
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            stats.forEach { stat ->
+                Box(
+                    modifier = Modifier
+                        .height((stat.minutes / max.toFloat() * 160).dp)
+                        .width(24.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(6.dp)
+                        )
+                )
+            }
+        }
+
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            stats.forEach { stat ->
                 Card {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Süre: ${session.durationMinutes} m")
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
-                            "Date: ${
-                                SimpleDateFormat(
-                                    "dd MMM yyyy - HH:mm",
-                                    Locale.getDefault()
-                                ).format(Date(session.timestamp))
-                            }"
+                            text = stat.dayLabel,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        Text(
+                            text = "${stat.minutes} min",
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }
             }
+        }
+    }
+}
+@Composable
+private fun AverageCard(title: String, value: Int) {
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(title, style = MaterialTheme.typography.labelLarge)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("$value min", style = MaterialTheme.typography.headlineLarge)
         }
     }
 }
