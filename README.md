@@ -1,4 +1,5 @@
 SEED Pomodoro
+
 SEED Pomodoro is an Android application designed to help users manage their study time using the Pomodoro technique.
 The app allows users to start and track focus sessions, customize timer durations, and view basic study statistics.
 
