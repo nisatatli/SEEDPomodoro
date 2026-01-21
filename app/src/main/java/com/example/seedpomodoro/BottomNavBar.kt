@@ -23,7 +23,7 @@ fun BottomNavBar(navController: NavController) {
             NavigationBarItem(
                 selected = currentRoute == screen.route,
                 onClick = { navController.navigate(screen.route) },
-                icon = { /* İkon ekleyebilirsin, şimdilik Text */ },
+                icon = { /* can icon be added but for now just text */ },
                 label = { Text(screen.route.capitalize()) }
             )
         }
