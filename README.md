@@ -16,6 +16,7 @@ The app allows users to start and track focus sessions, customize timer duration
 - Bottom navigation for Timer, Statistics, and Settings screens
 
 #Architecture
+
 The application follows the MVVM (Model–View–ViewModel) architecture pattern.
 - UI layer: Jetpack Compose
 - ViewModel layer: Android ViewModel with StateFlow
