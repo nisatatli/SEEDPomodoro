@@ -11,7 +11,7 @@ class StatsViewModel(
     private val repository: SeedRepository
 ) : ViewModel() {
 
-    // 🔹 Tüm session'lar
+
     val sessions: StateFlow<List<StudySession>> =
         repository.getAllSessions()
             .stateIn(
@@ -20,7 +20,7 @@ class StatsViewModel(
                 initialValue = emptyList()
             )
 
-    // 🔹 Toplam session sayısı
+
     val totalSessions: StateFlow<Int> =
         sessions
             .map { it.size }
@@ -30,7 +30,7 @@ class StatsViewModel(
                 0
             )
 
-    // 🔹 Toplam dakika
+
     val totalMinutes: StateFlow<Int> =
         sessions
             .map { list -> list.sumOf { it.durationMinutes } }

@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.isSystemInDarkTheme
 
-// 🌱 Light Color Palette
+
 private val LightColorScheme = lightColorScheme(
     primary = GreenPrimary,
     onPrimary = Color.White,
@@ -20,7 +20,7 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F)
 )
 
-// 🌙 Dark Color Palette (opsiyonel ama hazır)
+
 private val DarkColorScheme = darkColorScheme(
     primary = GreenPrimary,
     onPrimary = Color.Black,

@@ -26,7 +26,7 @@ fun WelcomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // 🌱 LOGO
+
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Seed Logo",

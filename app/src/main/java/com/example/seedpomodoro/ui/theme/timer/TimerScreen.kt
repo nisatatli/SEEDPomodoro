@@ -44,7 +44,7 @@ fun TimerScreen() {
     val minutes = timeLeft / 60
     val seconds = timeLeft % 60
 
-    // ⏱️ ŞİMDİLİK SABİT (ileride settings’e bağlanacak)
+
     val totalSeconds =
         if (mode == TimerMode.POMODORO) 25 * 60 else 5 * 60
 
@@ -71,7 +71,7 @@ fun TimerScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // 🔁 MODE LABEL
+
             Text(
                 text = if (mode == TimerMode.POMODORO) "Pomodoro" else "Break",
                 style = MaterialTheme.typography.titleLarge,
@@ -80,7 +80,7 @@ fun TimerScreen() {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ⭕ PROGRESS + TIME
+
             Box(contentAlignment = Alignment.Center) {
 
                 CircularProgressIndicator(
@@ -98,7 +98,7 @@ fun TimerScreen() {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // ▶️ CONTROLS
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
