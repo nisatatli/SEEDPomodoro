@@ -70,13 +70,15 @@ fun SeedApp() {
                 TimerScreen()
             }
 
-            composable(Screen.Stats.route) {
-                StatsScreen()
-            }
+                        composable(Screen.Stats.route) {
+                            StatsScreen()
+                        }
 
-            composable(Screen.Settings.route) {
-                SettingsScreen()
-            }
+                        composable(Screen.Settings.route) {
+                            SettingsScreen()
+                        }
+
+
         }
     }
 }

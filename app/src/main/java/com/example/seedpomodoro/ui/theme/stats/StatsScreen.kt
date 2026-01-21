@@ -6,10 +6,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.seedpomodoro.SeedApplication
+import com.example.seedpomodoro.ui.theme.stats.StatsViewModel
+import com.example.seedpomodoro.ui.theme.stats.StatsViewModelFactory
+
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -17,105 +20,64 @@ import java.util.*
 @Composable
 fun StatsScreen() {
 
-    // 🔥 Application & Repository
     val context = LocalContext.current
     val app = context.applicationContext as SeedApplication
 
-    // 🔥 ViewModel (Factory ile)
     val viewModel: StatsViewModel = viewModel(
         factory = StatsViewModelFactory(app.repository)
     )
 
-    val uiState by viewModel.uiState.collectAsState()
-
+    val totalSessions by viewModel.totalSessions.collectAsState()
+    val totalMinutes by viewModel.totalMinutes.collectAsState()
+    val sessions by viewModel.sessions.collectAsState()
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("İstatistikler") })
+            TopAppBar(title = { Text("Statistics") })
         }
-    ) { innerPadding ->
+    ) { padding ->
 
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp)
+                .padding(padding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            // 🔥 ÖZET KART
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column {
-                        Text("Toplam Session", style = MaterialTheme.typography.labelLarge)
-                        Text(
-                            text = uiState.totalSessions.toString(),
-                            style = MaterialTheme.typography.headlineMedium
-                        )
-                    }
-
-                    Column {
-                        Text("Toplam Süre (dk)", style = MaterialTheme.typography.labelLarge)
-                        Text(
-                            text = uiState.totalMinutes.toString(),
-                            style = MaterialTheme.typography.headlineMedium
-                        )
+            item {
+                Card {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Total Session", style = MaterialTheme.typography.labelLarge)
+                        Text("$totalSessions", style = MaterialTheme.typography.headlineMedium)
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // 📋 LİSTE
-            if (uiState.sessions.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = androidx.compose.ui.Alignment.Center
-                ) {
-                    Text("Henüz kayıtlı bir çalışma yok.")
-                }
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(uiState.sessions) { session ->
-                        SessionItem(session)
+            item {
+                Card {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Total Minutes (m)", style = MaterialTheme.typography.labelLarge)
+                        Text("$totalMinutes", style = MaterialTheme.typography.headlineMedium)
                     }
                 }
             }
-        }
-    }
 
-}
-@Composable
-fun SessionItem(session: com.example.seedpomodoro.data.local.StudySession) {
-
-    val dateFormat = remember {
-        SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault())
-    }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-
-            Text(
-                text = "Süre: ${session.durationMinutes} dk",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "Tarih: ${dateFormat.format(Date(session.timestamp))}",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            items(sessions) { session ->
+                Card {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Süre: ${session.durationMinutes} m")
+                        Text(
+                            "Date: ${
+                                SimpleDateFormat(
+                                    "dd MMM yyyy - HH:mm",
+                                    Locale.getDefault()
+                                ).format(Date(session.timestamp))
+                            }"
+                        )
+                    }
+                }
+            }
         }
     }
 }

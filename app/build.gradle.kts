@@ -28,7 +28,7 @@ android {
                 "proguard-rules.pro"
             )
         }
-    }
+    } 
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -78,6 +78,8 @@ dependencies {
     // Coroutine
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.datastore.preferences)
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 
 }
 configurations.all {

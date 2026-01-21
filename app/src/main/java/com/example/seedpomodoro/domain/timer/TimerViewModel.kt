@@ -24,19 +24,18 @@ class TimerViewModel(
     private val _isRunning = MutableStateFlow(false)
     val isRunning: StateFlow<Boolean> = _isRunning
 
-    // Aktif pomodoro süresi (dk)
-    private var currentPomodoroMinutes: Int = 25
+    private val _mode = MutableStateFlow(TimerMode.POMODORO)
+    val mode: StateFlow<TimerMode> = _mode
+
+    private var pomodoroMinutes = 25
+    private var breakMinutes = 5
 
     init {
-        // 🔥 Settings'i dinle
         viewModelScope.launch {
             settingsRepository.settings.collect { settings ->
-                currentPomodoroMinutes = settings.pomodoroMinutes
-
-                // ⛔ Timer çalışıyorsa otomatik resetleme
-                if (!_isRunning.value) {
-                    resetTimer()
-                }
+                pomodoroMinutes = settings.pomodoroMinutes
+                breakMinutes = settings.breakMinutes
+                resetTimer()
             }
         }
     }
@@ -52,7 +51,7 @@ class TimerViewModel(
             }
 
             if (_timeLeft.value == 0) {
-                saveCompletedSession()
+                onTimerFinished()
             }
 
             _isRunning.value = false
@@ -65,14 +64,26 @@ class TimerViewModel(
 
     fun resetTimer() {
         timerJob?.cancel()
-        _timeLeft.value = currentPomodoroMinutes * 60
+        _timeLeft.value = when (_mode.value) {
+            TimerMode.POMODORO -> pomodoroMinutes * 60
+            TimerMode.BREAK -> breakMinutes * 60
+        }
         _isRunning.value = false
     }
 
-    // 🔥 Pomodoro tamamlanınca DB’ye kaydet
-    private suspend fun saveCompletedSession() {
+    private suspend fun onTimerFinished() {
+        if (_mode.value == TimerMode.POMODORO) {
+            saveSession()
+            _mode.value = TimerMode.BREAK
+        } else {
+            _mode.value = TimerMode.POMODORO
+        }
+        resetTimer()
+    }
+
+    private suspend fun saveSession() {
         val session = StudySession(
-            durationMinutes = currentPomodoroMinutes,
+            durationMinutes = pomodoroMinutes,
             timestamp = System.currentTimeMillis()
         )
         repository.saveSession(session)

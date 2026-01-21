@@ -5,29 +5,38 @@ import androidx.lifecycle.viewModelScope
 import com.example.seedpomodoro.data.local.StudySession
 import com.example.seedpomodoro.repository.SeedRepository
 import kotlinx.coroutines.flow.*
-
-data class StatsUiState(
-    val sessions: List<StudySession> = emptyList(),
-    val totalSessions: Int = 0,
-    val totalMinutes: Int = 0
-)
+import kotlinx.coroutines.launch
 
 class StatsViewModel(
-    repository: SeedRepository
+    private val repository: SeedRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<StatsUiState> =
+    // 🔹 Tüm session'lar
+    val sessions: StateFlow<List<StudySession>> =
         repository.getAllSessions()
-            .map { sessions ->
-                StatsUiState(
-                    sessions = sessions,
-                    totalSessions = sessions.size,
-                    totalMinutes = sessions.sumOf { it.durationMinutes }
-                )
-            }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = StatsUiState()
+                initialValue = emptyList()
+            )
+
+    // 🔹 Toplam session sayısı
+    val totalSessions: StateFlow<Int> =
+        sessions
+            .map { it.size }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                0
+            )
+
+    // 🔹 Toplam dakika
+    val totalMinutes: StateFlow<Int> =
+        sessions
+            .map { list -> list.sumOf { it.durationMinutes } }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                0
             )
 }

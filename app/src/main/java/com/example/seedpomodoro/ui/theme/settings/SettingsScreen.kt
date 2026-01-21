@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.seedpomodoro.SeedApplication
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,7 +25,7 @@ fun SettingsScreen() {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Ayarlar") })
+            TopAppBar(title = { Text("Settings") })
         }
     ) { innerPadding ->
 
@@ -36,7 +37,7 @@ fun SettingsScreen() {
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
 
-            // ⏱️ Pomodoro Süresi Kartı
+
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
@@ -45,14 +46,14 @@ fun SettingsScreen() {
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "⏱ Pomodoro Süresi",
+                        text = "Pomodoro Time",
                         style = MaterialTheme.typography.titleMedium
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "${settings.pomodoroMinutes} dakika",
+                        text = "${settings.pomodoroMinutes} minutes",
                         style = MaterialTheme.typography.bodyMedium
                     )
 
@@ -61,13 +62,12 @@ fun SettingsScreen() {
                         onValueChange = {
                             viewModel.setPomodoroMinutes(it.toInt())
                         },
-                        valueRange = 10f..60f,
-                        steps = 4
+                        valueRange = 1f..60f
                     )
+
                 }
             }
 
-            // ☕ Mola Süresi Kartı
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
@@ -76,25 +76,25 @@ fun SettingsScreen() {
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "☕ Mola Süresi",
+                        text = "Break Time",
                         style = MaterialTheme.typography.titleMedium
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "${settings.breakMinutes} dakika",
+                        text = "${settings.breakMinutes} minutes",
                         style = MaterialTheme.typography.bodyMedium
                     )
 
                     Slider(
                         value = settings.breakMinutes.toFloat(),
                         onValueChange = {
-                            viewModel.setBreakMinutes(it.toInt())
+                            viewModel.setBreakMinutes(it.roundToInt())
                         },
-                        valueRange = 3f..15f,
-                        steps = 3
+                        valueRange = 1f..30f
                     )
+
                 }
             }
         }
